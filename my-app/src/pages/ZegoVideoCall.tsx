@@ -1,29 +1,27 @@
 import React, { useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { auth } from "../firebaseConfig";
 
-// Constants
 const APP_ID = 859242371;
 const APP_SIGN = "f22df8ec86dc2078d52a9c9f4e9e0dbcb745433328da180d8133849b8d975319";
 
-// Interface
-interface CallState {
-  callID: string;
-  userID: string;
-  userName: string;
-}
-
 const ZegoVideoCall: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const { callID, userID, userName } = location.state as CallState;
+  const callID = searchParams.get("roomID");
+  const userID = auth.currentUser?.uid;
+  const userName = auth.currentUser?.displayName || "Người dùng";
 
   useEffect(() => {
+    console.log("callID", callID);
+    console.log("userID", userID);
+    console.log("userName", userName);
     if (!callID || !userID || !userName) {
       alert("Thiếu thông tin cuộc gọi.");
-      navigate("/messages"); // fallback
+      navigate("/messages");
       return;
     }
 
@@ -41,7 +39,7 @@ const ZegoVideoCall: React.FC = () => {
       sharedLinks: [
         {
           name: "Sao chép liên kết",
-          url: `${window.location.origin}/video-call?callID=${callID}`,
+          url: `${window.location.origin}/video-call?roomID=${callID}`,
         },
       ],
       scenario: {

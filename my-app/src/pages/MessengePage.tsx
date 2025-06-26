@@ -48,6 +48,7 @@ export default function ChatPage() {
   };
 
   const handleVideoCall = async () => {
+    console.log("handleVideoCall called", selectedUser, currentUser);
     if (!selectedUser || !currentUser) return;
     const callID = generateCallID(currentUser.uid, selectedUser.id);
 
@@ -61,13 +62,9 @@ export default function ChatPage() {
       status: "calling",
     });
 
-    navigate("/calling", {
-      state: {
-        callID: callID,
-        userID: currentUser.uid,
-        userName: currentUser.displayName,
-      },
-    });
+    navigate(`/calling?callID=${callID}`);
+
+    ;
   };
 
   useEffect(() => {

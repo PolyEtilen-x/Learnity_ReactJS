@@ -1,22 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
-import { db } from "../firebaseConfig";
-
-interface CallingScreenState {
-  callID: string;
-  userID: string;
-  userName: string;
-}
+import { db, auth } from "../firebaseConfig";
 
 const CallingScreen: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { callID, userID, userName } = location.state as CallingScreenState;
+  const [searchParams] = useSearchParams();
+
+  const callID = searchParams.get("callID") || searchParams.get("roomID");
+  const userID = auth.currentUser?.uid;
+  const userName = auth.currentUser?.displayName || "Người dùng";
 
   const [isCallActive, setIsCallActive] = useState(true);
 
+  console.log("callID", callID);
+  console.log("userID", userID);
+    console.log("userName", userName);
   useEffect(() => {
+    if (!callID || !userID || !userName) {
+      alert("Thiếu thông tin cuộc gọi.");
+      navigate("/messages");
+      return;
+    }
+
     const callDocRef = doc(db, "video_calls", callID);
 
     const unsubscribe = onSnapshot(callDocRef, (snapshot) => {
@@ -35,20 +41,22 @@ const CallingScreen: React.FC = () => {
       if (isCallActive) {
         endCall("Không có phản hồi từ người nhận.");
       }
-    }, 30000);
+    }, 30000); // 30 giây timeout
 
     return () => {
       unsubscribe();
       clearTimeout(timeout);
     };
-  }, [callID]);
+  }, [callID, userID, userName]);
 
   const endCall = async (reason?: string) => {
     setIsCallActive(false);
 
-    await updateDoc(doc(db, "video_calls", callID), {
-      status: "cancelled",
-    });
+    if (callID) {
+      await updateDoc(doc(db, "video_calls", callID), {
+        status: "cancelled",
+      });
+    }
 
     navigate("/messages");
 
