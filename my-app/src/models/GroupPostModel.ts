@@ -1,5 +1,5 @@
 import { Timestamp, type DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
-import { auth } from "../firebaseConfig"; // Đường dẫn tới firebase config của bạn
+import { auth } from "../firebaseConfig"; 
 
 export interface GroupPostModel {
   postId: string;

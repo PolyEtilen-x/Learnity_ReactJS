@@ -20,7 +20,6 @@ const GroupPage: React.FC = () => {
   const [searchAvailable, setSearchAvailable] = useState("");
   const navigate = useNavigate();
 
-
   const db = getFirestore();
   const auth = getAuth();
   const user = auth.currentUser;
@@ -66,7 +65,7 @@ const GroupPage: React.FC = () => {
   const renderGroupCard = (group: GroupModel, joined: boolean) => (
   <div
     key={group.id}
-    onClick={() => navigate(`/group/${group.id}`, {
+    onClick={() => navigate(`/groups/${group.id}`, {
       state: { groupName: group.name }
     })}
     className="border p-3 rounded mb-4 flex justify-between items-center gap-4"
@@ -97,7 +96,7 @@ const GroupPage: React.FC = () => {
       <div className="flex justify-center gap-4 mb-6">
         <button
           className={`px-4 py-2 rounded ${
-            tab === "joined" ? "bg-black text-white" : "bg-gray-200"
+            tab === "joined" ? "bg-black text-blue-500" : "bg-gray-200"
           }`}
           onClick={() => setTab("joined")}
         >
@@ -105,7 +104,7 @@ const GroupPage: React.FC = () => {
         </button>
         <button
           className={`px-4 py-2 rounded ${
-            tab === "available" ? "bg-black text-white" : "bg-gray-200"
+            tab === "available" ? "bg-black text-red-600" : "bg-gray-200"
           }`}
           onClick={() => setTab("available")}
         >

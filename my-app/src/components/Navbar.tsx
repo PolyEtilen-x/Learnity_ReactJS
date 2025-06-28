@@ -138,7 +138,7 @@ const menuItems = [
           collapsed ? "w-[80px]" : "w-[240px]"
         } border-r px-2 py-4 flex flex-col items-center md:items-start z-50`}
         style={{
-          backgroundColor: isDarkMode ? AppColors.darkBackground : AppColors.white,
+          backgroundColor: isDarkMode ? AppColors.darkBackground : "#C8FAE4",
           borderColor: isDarkMode ? AppColors.darkBackgroundSecond : "#e5e5e5",
         }}
       >

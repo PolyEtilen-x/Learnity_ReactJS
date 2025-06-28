@@ -144,7 +144,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="w-screen h-screen pl-[80px]" style={{ backgroundColor: isDarkMode ? "#1a1a1a" : "#E8F8F6" }}>
+    <div className="w-screen h-screen pl-[80px]" style={{ backgroundColor: isDarkMode ? "#1a1a1a" : "#C8FAE4" }}>
       <div className="flex h-full w-full">
         <aside className="w-[400px] border-r overflow-y-auto p-4" style={{ backgroundColor: isDarkMode ? "#1a1a1a" : "#E8F8F6" }}>
           <h2 className="text-xl font-semibold mb-4">Messages</h2>

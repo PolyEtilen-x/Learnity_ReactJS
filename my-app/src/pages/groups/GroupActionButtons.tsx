@@ -84,7 +84,7 @@ const GroupActionButtons: React.FC<GroupActionButtonsProps> = ({
         </div>
         <button
           onClick={onInviteMember}
-          className="flex-1 flex items-center justify-center gap-2 bg-gray-700 text-white px-4 py-2 rounded-full shadow"
+          className="flex-1 flex items-center justify-center gap-2 bg-gray-700 text-black px-4 py-2 rounded-full shadow"
         >
           <FaPlus />
           Mời bạn

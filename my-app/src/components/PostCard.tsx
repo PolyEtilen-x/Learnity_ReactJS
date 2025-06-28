@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { type PostModel } from "../models/PostModel";
-import { Heart, MessageCircle, Share2, X } from "lucide-react";
+import {
+  FiMoreVertical,
+  FiHeart,
+  FiMessageCircle,
+  FiShare2,
+} from "react-icons/fi";
 import {
   doc,
   getDoc,
@@ -16,11 +21,10 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { useCurrentUser } from "../hooks/useCurrentUser";
-import { AppTextStyles } from "../theme/theme";
 import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale/vi";
 import PostDetailPanel from "../pages/PostDetailPanel";
-import ShareOptionsDialog from "./ShareOptionsDialog"; // NEW
+import ShareOptionsDialog from "./ShareOptionsDialog";
 
 interface PostCardProps {
   post: PostModel;
@@ -59,18 +63,6 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
 
     fetchState();
   }, [post.postId, user]);
-
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setShowDetail(false);
-        setShowImageModal(false);
-        setShowShareOptions(false);
-      }
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, []);
 
   const handleLikePost = async () => {
     if (!user || !post.postId) return;
@@ -125,97 +117,72 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
     alert("Đã chia sẻ bài viết.");
   };
 
-  const handleExternalShare = async () => {
-    const text = `${post.content ?? ""}\n\n${post.postDescription ?? ""}\n(Chia sẻ từ Learnity)`;
-    try {
-      await navigator.share({ text });
-    } catch (err) {
-      console.error("Không thể chia sẻ ra ngoài:", err);
-    }
-  };
+  const ActionButton = ({ icon, count, onClick, active }: { icon: React.ReactNode; count: number; onClick: () => void; active?: boolean }) => (
+    <button onClick={onClick} className="flex items-center gap-1 text-sm text-gray-700 hover:text-black">
+      <span className={`text-lg ${active ? "text-red-500" : ""}`}>{icon}</span>
+      <span>{count}</span>
+    </button>
+  );
 
   return (
-    <div className="w-full border-b px-4 py-5 relative">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <img
-            src={post.avatarUrl || "/default-avatar.png"}
-            alt="avatar"
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <div>
-            <div style={AppTextStyles.subtitle(isDarkMode)}>
-              {post.username || "Người dùng"}
+    <div className="bg-white rounded-xl shadow-sm border p-4 mb-4" style={{ backgroundColor: "#C8FAE4" }}>
+      <div className="flex items-start gap-3">
+        <img
+          src={post.avatarUrl || "/default-avatar.png"}
+          alt="avatar"
+          className="w-10 h-10 rounded-full object-cover"
+        />
+        <div className="flex-1">
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="font-semibold text-sm">{post.username || "Người dùng"}</p>
+              <p className="text-xs text-gray-500">{formatDistanceToNow(post.createdAt, { addSuffix: true, locale: vi })}</p>
             </div>
-            <div style={AppTextStyles.caption(isDarkMode)}>
-              {formatDistanceToNow(post.createdAt, { addSuffix: true, locale: vi })}
+            <FiMoreVertical className="text-gray-600 cursor-pointer" onClick={() => {
+              if (user?.uid === post.uid && window.confirm("Bạn có muốn xóa bài viết này?")) {
+                console.log("Trigger delete function");
+              }
+            }} />
+          </div>
+          {post.postDescription && <p className="font-bold mt-2 text-base">{post.postDescription}</p>}
+          {post.content && <p className="mt-1 text-sm text-gray-800 whitespace-pre-line">{post.content}</p>}
+          {post.imageUrl && (
+            <div className="mt-3">
+              <img
+                src={post.imageUrl}
+                alt="post"
+                className="rounded-md w-full max-h-[300px] object-cover"
+                onError={(e) => (e.currentTarget.src = "/broken-image.png")}
+              />
             </div>
+          )}
+          <div className="flex justify-around items-center mt-4 border-t pt-2 text-sm">
+            <ActionButton icon={isLiked ? <FiHeart fill="red" /> : <FiHeart />} count={likeCount} onClick={handleLikePost} active={isLiked} />
+            <ActionButton icon={<FiMessageCircle />} count={commentCount} onClick={() => setShowDetail(true)} />
+            <ActionButton icon={<FiShare2 />} count={shareCount} onClick={() => setShowShareOptions(true)} />
           </div>
         </div>
       </div>
 
-      {post.postDescription && (
-        <p style={AppTextStyles.label(isDarkMode)} className="mb-1">
-          {post.postDescription}
-        </p>
-      )}
-      {post.content && (
-        <p style={AppTextStyles.body(isDarkMode)} className="mb-3">
-          {post.content}
-        </p>
-      )}
-      {post.imageUrl && (
-        <div className="mb-3 rounded-md overflow-hidden">
-          <img
-            src={post.imageUrl}
-            alt="post"
-            className="w-full object-cover cursor-pointer"
-            onClick={() => setShowImageModal(true)}
-          />
-        </div>
-      )}
-
-      <div className={`flex gap-6 items-center text-lg ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
-        <button   className="flex items-center unstyled-button gap-1" 
-                  onClick={handleLikePost}>
-          <Heart size={25} fill={isLiked ? "red" : "none"} stroke={isLiked ? "red" : "currentColor"} />
-          <span>{likeCount}</span>
-        </button>
-
-        <button className="flex items-center unstyled-button gap-1" 
-                onClick={() => setShowDetail(true)}>
-          <MessageCircle size={25} />
-          <span>{commentCount}</span>
-        </button>
-
-        <button className="flex items-center unstyled-button gap-1" 
-                onClick={() => setShowShareOptions(true)}>
-          <Share2 size={25} />
-          <span>{shareCount}</span>
-        </button>
-      </div>
+      <ShareOptionsDialog
+        isOpen={showShareOptions}
+        onClose={() => setShowShareOptions(false)}
+        onInternalShare={handleInternalShare}
+        onExternalShare={async () => {
+          const text = `${post.content ?? ""}\n\n${post.postDescription ?? ""}\n(Chia sẻ từ Learnity)`;
+          try {
+            await navigator.share({ text });
+          } catch (err) {
+            console.error("Không thể chia sẻ ra ngoài:", err);
+          }
+        }}
+      />
 
       {showDetail && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center">
           <PostDetailPanel post={post} onClose={() => setShowDetail(false)} />
         </div>
       )}
-
-      {showImageModal && (
-        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center" onClick={() => setShowImageModal(false)}>
-          <img src={post.imageUrl} className="max-w-full max-h-full rounded" />
-          <button className="absolute top-4 right-4" onClick={() => setShowImageModal(false)}>
-            <X className="text-black" />
-          </button>
-        </div>
-      )}
-
-      <ShareOptionsDialog
-        isOpen={showShareOptions}
-        onClose={() => setShowShareOptions(false)}
-        onInternalShare={handleInternalShare}
-        onExternalShare={handleExternalShare}
-      />
     </div>
   );
 }
