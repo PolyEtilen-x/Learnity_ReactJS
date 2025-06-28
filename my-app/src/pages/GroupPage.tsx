@@ -8,6 +8,7 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import type { GroupModel } from "../models/GroupModel";
+import { useNavigate } from "react-router-dom";
 
 const GroupPage: React.FC = () => {
   const [joinedGroups, setJoinedGroups] = useState<GroupModel[]>([]);
@@ -17,6 +18,8 @@ const GroupPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchJoined, setSearchJoined] = useState("");
   const [searchAvailable, setSearchAvailable] = useState("");
+  const navigate = useNavigate();
+
 
   const db = getFirestore();
   const auth = getAuth();
@@ -61,24 +64,32 @@ const GroupPage: React.FC = () => {
   }, [user?.uid]);
 
   const renderGroupCard = (group: GroupModel, joined: boolean) => (
-    <div
-      key={group.id}
-      className="border p-3 rounded mb-4 flex justify-between items-center"
-    >
-      <div>
-        <p className="font-semibold">{group.name}</p>
-        <p className="text-sm text-gray-600">
-          {group.membersCount} thành viên • {group.privacy}
-        </p>
-      </div>
-      <button
-        className={`text-${joined ? "red" : "blue"}-500 font-medium`}
-        onClick={() => alert(joined ? "Rời nhóm" : "Tham gia nhóm")}
-      >
-        {joined ? "Rời nhóm" : "Tham gia"}
-      </button>
+  <div
+    key={group.id}
+    onClick={() => navigate(`/group/${group.id}`, {
+      state: { groupName: group.name }
+    })}
+    className="border p-3 rounded mb-4 flex justify-between items-center gap-4"
+  >
+    <img
+      src={group.avatarUrl || "/default-avatar.png"}
+      alt="avatar"
+      className="w-12 h-12 rounded-full object-cover"
+    />
+    <div className="flex-1">
+      <p className="font-semibold">{group.name}</p>
+      <p className="text-sm text-gray-600">
+        {group.membersCount} thành viên • {group.privacy}
+      </p>
     </div>
-  );
+    <button
+      className={`text-${joined ? "red" : "blue"}-500 font-medium`}
+      onClick={() => alert(joined ? "Rời nhóm" : "Tham gia nhóm")}
+    >
+      {joined ? "Rời nhóm" : "Tham gia"}
+    </button>
+  </div>
+);
 
   return (
     <div className="p-4 max-w-3xl mx-auto">

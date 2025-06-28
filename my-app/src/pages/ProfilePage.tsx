@@ -92,7 +92,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="flex gap-2 mt-4">
+      <div className="flex gap-6 mt-4">
         {[
           { key: "posts", label: "Bài đăng" },
           { key: "comments", label: "Bình luận" },
@@ -100,13 +100,14 @@ export default function ProfilePage() {
         ].map((item) => (
           <button
             key={item.key}
-            className="px-4 py-1 text-sm rounded-full whitespace-nowrap"
+            className={`px-16 py-6 text-2xl font-bold rounded-full whitespace-nowrap border ${tab === item.key ? 'border-4 border-blue-500' : 'border-gray-400'}`}
             style={{
               backgroundColor:
                 tab === item.key
                   ? AppBackgroundStyles.footerBackground(isDarkMode)
                   : AppBackgroundStyles.mainBackground(isDarkMode),
               color: tab === item.key ? "#ffffff" : "#000000",
+              fontSize: "20px",
             }}
             onClick={() => setTab(item.key)}
           >

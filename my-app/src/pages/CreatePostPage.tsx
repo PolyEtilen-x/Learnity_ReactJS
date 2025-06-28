@@ -4,6 +4,7 @@ import { db } from "../firebaseConfig";
 import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { uploadImageToCloudinary } from "../utils/uploadtoCloudinary";
+import { FiImage } from "react-icons/fi";
 
 export default function CreatePostPage() {
   const { user } = useCurrentUser();
@@ -20,7 +21,12 @@ export default function CreatePostPage() {
   };
 
   const handleSubmit = async () => {
-    if (!title || !content || !user?.uid) return;
+    if (!title.trim() || !content.trim()) {
+      alert("Vui lòng nhập tiêu đề và nội dung bài viết.");
+      return;
+    }
+
+    if (!user?.uid) return;
 
     setLoading(true);
     let imageUrl = "";
@@ -79,17 +85,23 @@ export default function CreatePostPage() {
         rows={4}
       ></textarea>
 
-      <input
-        type="file"
-        accept="image/*"
-        onChange={handleImageChange}
-        className="mb-4"
-      />
+      <div className="mb-4" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <label htmlFor="imageUpload" className="cursor-pointer">
+          <FiImage size={40} />
+        </label>
+        <input
+          style={{ fontSize: "20px", lineHeight: "40px" }}
+          id="imageUpload"
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
+      </div>
 
       <button
         onClick={handleSubmit}
         disabled={loading}
-        className="bg-black text-white px-6 py-2 rounded hover:opacity-80"
+        className="bg-black text-black px-6 py-2 rounded hover:opacity-80"
       >
         {loading ? "Đang đăng..." : "Đăng bài"}
       </button>

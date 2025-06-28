@@ -11,9 +11,7 @@ import GroupPage from "../pages/GroupPage";
 import MessengePage from "../pages/MessengePage";
 import VideoCallPage from "../pages/ZegoVideoCall";
 import CallingScreen from "../pages/CallingScreen";
-
-// Nếu sau này có Auth, bạn có thể thêm PrivateRoute ở đây
-// const isAuthenticated = false;
+import GroupContentPage from "../pages/GroupContentPage";
 
 export default function AppRouter() {
   return (
@@ -26,6 +24,7 @@ export default function AppRouter() {
         <Route path="profile" element={<ProfilePage />} />
         <Route path="create" element={<CreatePostPage />} />
         <Route path="groups" element={<GroupPage />} />  
+        <Route path="/group/:groupId" element={<GroupContentPage />} />
         <Route path="messages" element={<MessengePage />} />      
       </Route>
 

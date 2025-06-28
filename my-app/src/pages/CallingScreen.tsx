@@ -72,7 +72,7 @@ const CallingScreen: React.FC = () => {
       <h2 className="text-xl mb-6 animate-pulse">Đang chờ người nhận...</h2>
       <button
         onClick={() => endCall()}
-        className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full text-lg"
+        className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-black px-6 py-3 rounded-full text-lg"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path

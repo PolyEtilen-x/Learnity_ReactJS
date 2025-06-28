@@ -137,9 +137,16 @@ export default function PostDetailPanel({ post, onClose }: Props) {
         </button>
 
         <div className="mb-4">
-          <h2 className="text-lg font-bold">{post.username}</h2>
-          <p className="text-sm text-gray-500">{post.postDescription}</p>
+          <div className="flex items-center gap-3 mb-2">
+            <img src={post.avatarUrl || "/default-avatar.png"} alt="avatar" className="w-10 h-10 rounded-full" />
+            <div>
+              <h2 className="text-lg font-bold">{post.username}</h2>
+            </div>
+          </div>
+
+          <p className="text-lg text-black font-bold">{post.postDescription}</p>
           <p className="mt-2">{post.content}</p>
+          
           {post.imageUrl && (
             <img src={post.imageUrl} alt="post" className="w-full mt-3 rounded cursor-pointer" />
           )}
@@ -193,7 +200,6 @@ export default function PostDetailPanel({ post, onClose }: Props) {
             <button
               onClick={handleSubmit}
               className="bg-black text-blue-500 px-4 rounded"
-              
             >
               Gửi
             </button>

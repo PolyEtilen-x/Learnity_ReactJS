@@ -175,19 +175,22 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
         </div>
       )}
 
-      <div className={`flex gap-6 items-center text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
-        <button className="flex items-center gap-1" onClick={handleLikePost}>
-          <Heart size={18} fill={isLiked ? "red" : "none"} stroke={isLiked ? "red" : "currentColor"} />
+      <div className={`flex gap-6 items-center text-lg ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+        <button   className="flex items-center unstyled-button gap-1" 
+                  onClick={handleLikePost}>
+          <Heart size={25} fill={isLiked ? "red" : "none"} stroke={isLiked ? "red" : "currentColor"} />
           <span>{likeCount}</span>
         </button>
 
-        <button className="flex items-center gap-1" onClick={() => setShowDetail(true)}>
-          <MessageCircle size={18} />
+        <button className="flex items-center unstyled-button gap-1" 
+                onClick={() => setShowDetail(true)}>
+          <MessageCircle size={25} />
           <span>{commentCount}</span>
         </button>
 
-        <button className="flex items-center gap-1" onClick={() => setShowShareOptions(true)}>
-          <Share2 size={18} />
+        <button className="flex items-center unstyled-button gap-1" 
+                onClick={() => setShowShareOptions(true)}>
+          <Share2 size={25} />
           <span>{shareCount}</span>
         </button>
       </div>
