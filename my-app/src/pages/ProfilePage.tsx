@@ -8,6 +8,7 @@ import { useTheme } from "../theme/ThemeProvider";
 import { AppBackgroundStyles } from "../theme/theme";
 import type { PostModel } from "../models/PostModel";
 import { postFromDocument } from "../models/PostModel";
+import SharedPostTab from "../components/SharedPostList";
 
 
 interface UserInfoModel {
@@ -76,7 +77,6 @@ export default function ProfilePage() {
             >
               Chỉnh sửa
             </button>
-            <button className="text-xl hover:opacity-60">⚙️</button>
           </div>
 
           <div className="flex gap-4 mt-2 text-sm">
@@ -92,15 +92,14 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className="flex gap-6 mt-4">
+      <div className="flex gap-6 mt-2">
         {[
           { key: "posts", label: "Bài đăng" },
-          { key: "comments", label: "Bình luận" },
           { key: "shared", label: "Bài chia sẻ" },
         ].map((item) => (
           <button
             key={item.key}
-            className={`px-16 py-6 text-2xl font-bold rounded-full whitespace-nowrap border ${tab === item.key ? 'border-4 border-blue-500' : 'border-gray-400'}`}
+            className={`px-12 py-5 text-2xl font-bold rounded-full whitespace-nowrap border ${tab === item.key ? 'border-4 border-blue-500' : 'border-gray-400'}`}
             style={{
               backgroundColor:
                 tab === item.key
@@ -124,6 +123,7 @@ export default function ProfilePage() {
           <PostCard post={post} isDarkMode={isDarkMode} />
         </div>
       ))}
+    {tab === "shared" && <SharedPostTab />}
   </div>
 </div>
 

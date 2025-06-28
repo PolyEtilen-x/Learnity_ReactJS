@@ -13,6 +13,11 @@ import VideoCallPage from "../pages/ZegoVideoCall";
 import CallingScreen from "../pages/CallingScreen";
 import GroupContentPage from "../pages/GroupContentPage";
 import CreateGroupPostPage from "../pages/CreatePostGroupPage";
+import EditProfilePage from "../pages/EditProfilePage";
+import SettingsPage from "../pages/SettingsPage";
+import PomodoroPage from "../pages/settings/PomodoroPage";
+
+
 
 export default function AppRouter() {
   return (
@@ -28,6 +33,9 @@ export default function AppRouter() {
         <Route path="groups/:groupId" element={<GroupContentPage />} />
         <Route path="groups/:groupId/create-post" element={<CreateGroupPostPage />} />
         <Route path="messages" element={<MessengePage />} />      
+        <Route path="/edit-profile" element={<EditProfilePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/pomodoro" element={<PomodoroPage />} />
       </Route>
 
       <Route path="/video-call" element={<VideoCallPage />} />

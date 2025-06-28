@@ -16,7 +16,7 @@ import {
   deleteDoc,
   setDoc,
   getDoc,
-  where
+  where,
 } from "firebase/firestore";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useTheme } from "../theme/ThemeProvider";
@@ -36,7 +36,7 @@ export default function PostDetailPanel({ post, onClose }: Props) {
   const [likeCount, setLikeCount] = useState(post.likes || 0);
   const [shareCount, setShareCount] = useState(post.shares || 0);
 
-  const commentRef = collection(db, "comments", post.postId!, "list");
+  const commentRef = collection(db, "shared_post_comments", post.postId!, "comments");
   const postRef = doc(db, "posts", post.postId!);
   const likeDocRef = doc(db, "post_likes", `${post.postId}_${user?.uid}`);
 
@@ -66,17 +66,42 @@ export default function PostDetailPanel({ post, onClose }: Props) {
   const handleSubmit = async () => {
     if (!input.trim() || !user) return;
 
-    await addDoc(commentRef, {
-      content: input.trim(),
-      userId: user.uid,
-      username: user.username,
-      userAvatar: user.avatarUrl,
-      createdAt: serverTimestamp(),
-    });
+    try {
+      if (!user?.uid || !post?.uid) return;
 
-    setInput("");
-    const snap = await getDocs(query(commentRef, orderBy("createdAt", "desc")));
-    setComments(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+      const userData = userSnap.exists() ? userSnap.data() : {};
+
+      const authorSnap = await getDoc(doc(db, "users", post.uid));
+      const authorData = authorSnap.exists() ? authorSnap.data() : {};
+
+
+      const comment = {
+        userId: user.uid,
+        username: userData.username || user.displayName || "Người dùng",
+        userAvatar: userData.avatarUrl,
+        content: input.trim(),
+        createdAt: serverTimestamp(),
+
+        postId: post.postId,
+        postContent: post.content,
+        postImageUrl: post.imageUrl,
+        postDescription: post.postDescription,
+        postCreateAt: post.createdAt,
+
+        postAuthorId: post.uid,
+        postAuthorName: authorData.username || "Ẩn danh",
+        postAuthorAvatar: authorData.avatarUrl || "",
+      };
+
+      await addDoc(commentRef, comment);
+      setInput("");
+
+      const snap = await getDocs(query(commentRef, orderBy("createdAt", "desc")));
+      setComments(snap.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    } catch (err) {
+      console.error("Lỗi khi gửi comment:", err);
+    }
   };
 
   const handleLike = async () => {
@@ -128,9 +153,9 @@ export default function PostDetailPanel({ post, onClose }: Props) {
       className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm flex items-center justify-center"
       onKeyDown={(e) => e.key === "Escape" && onClose()}
     >
-      <div className="bg-white max-w-xl w-full max-h-[90vh] overflow-auto rounded-lg shadow-lg p-4 relative"
-            style={{ backgroundColor: AppBackgroundStyles.mainBackground(isDarkMode) }}
-
+      <div
+        className="bg-white max-w-xl w-full max-h-[90vh] overflow-auto rounded-lg shadow-lg p-4 relative"
+        style={{ backgroundColor: AppBackgroundStyles.mainBackground(isDarkMode) }}
       >
         <button onClick={onClose} className="absolute top-3 right-3">
           <X />
@@ -146,7 +171,7 @@ export default function PostDetailPanel({ post, onClose }: Props) {
 
           <p className="text-lg text-black font-bold">{post.postDescription}</p>
           <p className="mt-2">{post.content}</p>
-          
+
           {post.imageUrl && (
             <img src={post.imageUrl} alt="post" className="w-full mt-3 rounded cursor-pointer" />
           )}

@@ -113,7 +113,7 @@ const GroupPostCard: React.FC<GroupPostCardProps> = ({
               <img
                 src={postImageUrl}
                 alt="post"
-                className="rounded-md w-full max-h-[300px] object-cover"
+                className="rounded-md w-full object-cover"
                 onError={(e) =>
                   (e.currentTarget.src = "/broken-image.png")
                 }

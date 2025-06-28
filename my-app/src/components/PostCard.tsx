@@ -18,6 +18,7 @@ import {
   query,
   where,
   addDoc,
+  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import { useCurrentUser } from "../hooks/useCurrentUser";
@@ -36,7 +37,7 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
   const { user } = useCurrentUser();
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(post.likes || 0);
-  const [commentCount, setCommentCount] = useState(0);
+  const [commentCount, setCommentCount] = useState(post.comments ?? 0);
   const [shareCount, setShareCount] = useState(post.shares || 0);
   const [showDetail, setShowDetail] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -46,23 +47,42 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
   const likeDocRef = doc(db, "post_likes", `${post.postId}_${user?.uid}`);
   const commentsCollection = collection(db, "comments", post.postId!, "list");
 
+  const getCommentCount = async (postId: string): Promise<number> => {
+  try {
+    const snap = await getDocs(
+      collection(db, "shared_post_comments", postId, "comments")
+    );
+    return snap.size;
+  } catch (error) {
+    console.error("Lỗi khi đếm comment:", error);
+    return 0;
+  }
+};
+
+
   useEffect(() => {
-    if (!user || !post.postId) return;
+  if (!user || !post.postId) return;
 
-    const fetchState = async () => {
-      const likeSnap = await getDoc(likeDocRef);
+  const fetchState = async () => {
+    try {
+      const [likeSnap, postSnap, commentSnap] = await Promise.all([
+        getDoc(likeDocRef),
+        getDoc(postRef),
+        getDocs(query(collection(db, "comments", post.postId!, "list"), orderBy("createdAt", "desc"))),
+      ]);
+
       setIsLiked(likeSnap.exists());
-
-      const postSnap = await getDoc(postRef);
       setLikeCount(postSnap.data()?.likes || 0);
       setShareCount(postSnap.data()?.shares || 0);
+      setCommentCount(commentSnap.size); 
+    } catch (err) {
+      console.error("Lỗi khi load dữ liệu bài viết:", err);
+    }
+  };
 
-      const commentSnap = await getDocs(commentsCollection);
-      setCommentCount(commentSnap.size);
-    };
+  fetchState();
+}, [post.postId, user]);
 
-    fetchState();
-  }, [post.postId, user]);
 
   const handleLikePost = async () => {
     if (!user || !post.postId) return;

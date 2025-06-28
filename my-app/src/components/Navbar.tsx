@@ -6,6 +6,7 @@ import {
   UserCircle,
   UsersRound,
   PlusSquare,
+  Settings
 } from "lucide-react";
 import { useTheme } from "../theme/ThemeProvider";
 import { AppColors } from "../theme/theme";
@@ -44,6 +45,7 @@ export default function Navbar() {
       "/notifications": "notifications",
       "/groups": "groups",
       "/profile": "profile",
+      "/settings": "settings",
     };
 
     const matchedKey = pathToKeyMap[location.pathname];
@@ -115,13 +117,22 @@ const menuItems = [
   },
   { key: "groups", label: "Nhóm", icon: <UsersRound color={iconColor} />, path: "/groups" },
   {
-      key: "profile",
+    key: "profile",
       label: "Hồ sơ",
       icon: <UserCircle color={iconColor} />,
       onClick: () => {
         navigate("/profile");
         setActiveKey("profile");
       },
+  },
+  {
+    key: "settings",
+    label: "Cài đặt",
+    icon: <Settings color={iconColor} />,
+    onClick: () => {
+      navigate("/settings");
+      setActiveKey("settings");
+    },
   },
 ];
 
