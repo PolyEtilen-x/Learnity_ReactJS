@@ -31,21 +31,20 @@ export default function SearchPanel({ onClose }: { onClose: () => void }) {
     const [allUsers, setAllUsers] = useState<UserInfoModel[]>([]);
     const [filteredUsers, setFilteredUsers] = useState<UserInfoModel[]>([]);
 
-    // Expose fetchUsers for handleFollow to use
     const fetchUsers = async () => {
         const snapshot = await getDocs(collection(db, "users"));
         const users: UserInfoModel[] = snapshot.docs.map((docSnap) => ({
             uid: docSnap.id,
             ...docSnap.data(),
         })) as UserInfoModel[];
-        const others = users.filter((u) => u.uid !== user?.uid);
+
+        const others = users.filter((u) => u.uid !== user?.uid && u.uid);
         setAllUsers(others);
         setFilteredUsers(others);
     };
 
     useEffect(() => {
         fetchUsers();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user?.uid]);
 
     useEffect(() => {
@@ -62,7 +61,6 @@ export default function SearchPanel({ onClose }: { onClose: () => void }) {
         function handleClickOutside(event: MouseEvent) {
             if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
                 onClose();
-                navigate("/home");
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
@@ -87,17 +85,20 @@ export default function SearchPanel({ onClose }: { onClose: () => void }) {
             console.error("Lỗi khi cập nhật theo dõi:", err);
         }
     };
+    
+    const handleUserClick = (userId: string) => {
+        navigate(`/profile/${userId}`);
+    };
 
     return (
         <div
             ref={panelRef}
             className="fixed top-0 left-[80px] md:left-[80px] h-screen w-[400px] z-50 shadow-xl border-r overflow-y-auto"
             style={{
-                backgroundColor: isDarkMode ? "#1a1a1a" : "#E8F8F6",
+                backgroundColor: isDarkMode ? "#163B25 " : "#E8F8F6",
                 borderColor: isDarkMode ? "#444" : "#e5e5e5",
             }}
         >
-            {/* Search Input */}
             <div className="p-4 border-b" style={{ borderColor: isDarkMode ? "#444" : "#e5e5e5" }}>
                 <h2 style={AppTextStyles.title(isDarkMode)}>Search</h2>
                 <input
@@ -109,51 +110,51 @@ export default function SearchPanel({ onClose }: { onClose: () => void }) {
                 />
             </div>
 
-            {/* User Results */}
             <div className="p-4 space-y-3">
                 {filteredUsers.length === 0 ? (
                     <p className="text-sm text-gray-500 dark:text-gray-400">Không tìm thấy người dùng.</p>
                 ) : (
                     filteredUsers.map((u) => (
-                        <div
-                            key={u.uid}
-                            className="flex justify-between items-center p-2 rounded hover:bg-white dark:hover:bg-gray-800"
-                        >
-                            <div className="flex items-center gap-3">
-                                <img
-                                    src={u.avatarUrl || "/default-avatar.png"}
-                                    className="w-10 h-10 rounded-full"
-                                    alt="avatar"
-                                />
-                                <div>
-                                    <div className="font-medium text-black dark:text-white">
-                                        {u.displayName || "Người dùng"}
-                                    </div>
-                                    <div className="text-xs text-gray-500 dark:text-gray-400">@{u.username}</div>
-                                </div>
-                            </div>
-
-                            <button
-                            onClick={() => handleFollow(u)}
-                            className="px-3 py-1 text-sm rounded"
-                            style={{
-                                backgroundColor: u.followers?.includes(user?.uid || "")
-                                ? AppBackgroundStyles.footerBackground(isDarkMode)
-                                : AppBackgroundStyles.mainBackground(isDarkMode),
-                                color: u.followers?.includes(user?.uid || "") ? "#fff" : "#000000",
-                            }}
+                        u.uid && ( // Ensure that the user has a valid `uid`
+                            <div
+                                key={u.uid}
+                                className="flex justify-between items-center p-2 rounded hover:bg-white dark:hover:bg-gray-800"
                             >
-                            {u.followers?.includes(user?.uid || "") ? "Đang theo dõi" : "Theo dõi"}
-                            </button>
+                                <div className="flex items-center gap-3" onClick={() => handleUserClick(u.uid)}>
+                                    <img
+                                        src={u.avatarUrl || "/default-avatar.png"}
+                                        className="w-10 h-10 rounded-full"
+                                        alt="avatar"
+                                    />
+                                    <div>
+                                        <div className="font-medium"
+                                             style={{ color: isDarkMode ? "#FFFFFF" : "#000000" }}>
+                                            {u.displayName || "Người dùng"}
+                                        </div>
+                                        <div className="text-xs"
+                                             style={{color: isDarkMode? "#C0C0C0" : "#696969"}}>@{u.username}</div>
+                                    </div>
+                                </div>
 
-                        </div>
+                                <button
+                                    onClick={() => handleFollow(u)}
+                                    className="px-3 py-1 text-sm rounded"
+                                    style={{
+                                        backgroundColor: u.followers?.includes(user?.uid || "")
+                                            ? AppBackgroundStyles.footerBackground(isDarkMode)
+                                            : AppBackgroundStyles.mainBackground(isDarkMode),
+                                        color: u.followers?.includes(user?.uid || "") 
+                                            ? isDarkMode ?"#000" : "#fff"
+                                            : isDarkMode ? "#fff" : "#000", 
+                                    }}
+                                >
+                                    {u.followers?.includes(user?.uid || "") ? "Đang theo dõi" : "Theo dõi"}
+                                </button>
+                            </div>
+                        )
                     ))
                 )}
             </div>
         </div>
     );
 }
-function fetchUsers() {
-    throw new Error("Function not implemented.");
-}
-

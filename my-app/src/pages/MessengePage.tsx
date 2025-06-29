@@ -16,6 +16,7 @@ import {
   uploadBytes,
   getStorage,
 } from "firebase/storage";
+import { AppBackgroundStyles } from "../theme/theme";
 import { useTheme } from "../theme/ThemeProvider";
 import EmojiPicker from "emoji-picker-react";
 import { IoSend } from "react-icons/io5";
@@ -26,6 +27,7 @@ import { useNavigate } from "react-router-dom";
 import { type AppUser, parseAppUser } from "../models/AppUser";
 import MediumProfileImage from "../components/MediumProfileImage";
 import ChatUserCard from "../components/ChatUserCard";
+
 
 const storage = getStorage();
 
@@ -144,15 +146,15 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="w-screen h-screen pl-[80px]" style={{ backgroundColor: isDarkMode ? "#1a1a1a" : "#C8FAE4" }}>
+    <div className="w-screen h-screen pl-[80px]" style={{ backgroundColor: AppBackgroundStyles.mainBackground(isDarkMode) }}>
       <div className="flex h-full w-full">
-        <aside className="w-[400px] border-r overflow-y-auto p-4" style={{ backgroundColor: isDarkMode ? "#1a1a1a" : "#E8F8F6" }}>
-          <h2 className="text-xl font-semibold mb-4">Messages</h2>
+        <aside className="w-[400px] border-r overflow-y-auto p-4" style={{ backgroundColor: isDarkMode ? "#163B25 " : "#E8F8F6" }}>
+          <h2 className="mb-4" style={{color: isDarkMode ? "#fff" : "#000", fontSize: 32, }}>Messages</h2>
           <div className="flex overflow-x-auto space-x-4 mb-4">
             {users.map((user) => (
               <div key={user.id} className="text-center cursor-pointer" onClick={() => handleSelectUser(user)}>
                 <MediumProfileImage url={user.avatarUrl} isOnline={user.isOnline} size={56} />
-                <div className="text-sm mt-1 w-16 truncate">{user.name}</div>
+                <div className="text-sm mt-1 w-16 truncate" style={{color : isDarkMode ? "fff" : "000"}}>{user.name}</div>
               </div>
             ))}
           </div>
@@ -165,8 +167,8 @@ export default function ChatPage() {
           {!selectedUser ? (
             <div className="flex-1 flex items-center justify-center text-center">
               <div>
-                <div className="text-xl font-semibold mb-2">Your messages</div>
-                <p className="text-gray-500">Select a user to start chatting.</p>
+                <div className="text-xl font-bold mb-2" style={{color: isDarkMode ? "fff" :"000"}}>Your messages</div>
+                <p className="text-xl" style={{color: isDarkMode? "fff" : "000"}}>Select a user to start chatting.</p>
               </div>
             </div>
           ) : (
@@ -175,8 +177,8 @@ export default function ChatPage() {
                 <div className="flex items-center gap-3">
                   <img src={selectedUser.avatarUrl || "/default-avatar.png"} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
                   <div>
-                    <p className="font-semibold text-base">{selectedUser.name}</p>
-                    <p className="text-sm text-gray-500">@{selectedUser.name || "user"}</p>
+                    <p className="font-semibold text-base" style={{ color : isDarkMode ? "fff" : "000"}}>{selectedUser.name}</p>
+                    <p className="text-sm text-gray-500" style={{ color : isDarkMode ? "fff" : "000"}}>@{selectedUser.name || "user"}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4 text-gray-500">
@@ -193,7 +195,7 @@ export default function ChatPage() {
                 </div>
               </header>
 
-              <section className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
+              <section className="flex-1 overflow-y-auto px-4 py-2 space-y-2" style={{ display: 'flex', flexDirection: 'column' }}>
                 {messages.map((msg) => (
                   <div
                     key={msg.id}

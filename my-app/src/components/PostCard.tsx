@@ -136,6 +136,10 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
     setShareCount((prev) => prev + 1);
     alert("Đã chia sẻ bài viết.");
   };
+  const createdAt = post.createdAt ? new Date(post.createdAt) : null;
+  const timeAgo = createdAt && !isNaN(createdAt.getTime()) 
+    ? formatDistanceToNow(createdAt, { addSuffix: true, locale: vi }) 
+    : "Ngày không hợp lệ";
 
   const ActionButton = ({ icon, count, onClick, active }: { icon: React.ReactNode; count: number; onClick: () => void; active?: boolean }) => (
     <button onClick={onClick} className="flex items-center gap-1 text-sm text-gray-700 hover:text-black">
@@ -145,7 +149,7 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border p-4 mb-4" style={{ backgroundColor: "#C8FAE4" }}>
+    <div className="bg-white rounded-xl shadow-sm border p-4 mb-4" style={{ backgroundColor: isDarkMode ? "#163B25" : "#C8FAE4" }}>
       <div className="flex items-start gap-3">
         <img
           src={post.avatarUrl || "/default-avatar.png"}
@@ -155,17 +159,21 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
         <div className="flex-1">
           <div className="flex justify-between items-start">
             <div>
-              <p className="font-semibold text-sm">{post.username || "Người dùng"}</p>
-              <p className="text-xs text-gray-500">{formatDistanceToNow(post.createdAt, { addSuffix: true, locale: vi })}</p>
+              <p className="font-semibold text-sm"
+                style={{ color: isDarkMode ? "#FFFFFF" : "#000000" }}
+              >{post.username || "Người dùng"}</p>
+              <p className="text-xs text-gray-500">{timeAgo}</p>
             </div>
-            <FiMoreVertical className="text-gray-600 cursor-pointer" onClick={() => {
+            <FiMoreVertical className="text-gray-600 cursor-pointer" 
+                            style={{color: isDarkMode ? "#FFFFFF" : "#000000"}}
+                            onClick={() => {
               if (user?.uid === post.uid && window.confirm("Bạn có muốn xóa bài viết này?")) {
                 console.log("Trigger delete function");
               }
             }} />
           </div>
-          {post.postDescription && <p className="font-bold mt-2 text-base">{post.postDescription}</p>}
-          {post.content && <p className="mt-1 text-sm text-gray-800 whitespace-pre-line">{post.content}</p>}
+          {post.postDescription && <p className="font-bold mt-2 text-base" style={{color: isDarkMode ? "#FFFFFF" : "#000000" }}>{post.postDescription}</p>}
+          {post.content && <p className="mt-1 text-sm whitespace-pre-line" style={{color: isDarkMode ? "#FFFFFF" : "#000000" }}>{post.content}</p>}
           {post.imageUrl && (
             <div className="mt-3">
               <img
@@ -176,7 +184,7 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
               />
             </div>
           )}
-          <div className="flex justify-around items-center mt-4 border-t pt-2 text-sm">
+          <div className="flex justify-around items-center mt-4 border-t pt-2 text-sm"  style={{color: isDarkMode ? "#FFFFFF" : "#000000" }}>
             <ActionButton icon={isLiked ? <FiHeart fill="red" /> : <FiHeart />} count={likeCount} onClick={handleLikePost} active={isLiked} />
             <ActionButton icon={<FiMessageCircle />} count={commentCount} onClick={() => setShowDetail(true)} />
             <ActionButton icon={<FiShare2 />} count={shareCount} onClick={() => setShowShareOptions(true)} />

@@ -15,6 +15,7 @@ import { db } from "../firebaseConfig";
 import { useTheme } from "../theme/ThemeProvider";
 import { AppBackgroundStyles, AppTextStyles } from "../theme/theme";
 import clsx from "clsx";
+import { is } from "date-fns/locale";
 
 interface NotificationModel {
   id: string;
@@ -118,8 +119,8 @@ export default function NotificationPanel({
       ref={panelRef}
       className="fixed top-0 left-[80px] md:left-[80px] h-screen w-[400px] z-50 shadow-xl border-r overflow-y-auto"
       style={{
-        backgroundColor: isDarkMode ? "#1a1a1a" : "#E8F8F6",
-        borderColor: isDarkMode ? "#ffffff" : "#000000",
+          backgroundColor: isDarkMode ? "#163B25 " : "#E8F8F6",
+          borderColor: isDarkMode ? "#444" : "#e5e5e5",
       }}
     >
       <div className="p-4 border-b" style={{ borderColor: "#000000" }}>
@@ -140,7 +141,9 @@ export default function NotificationPanel({
                 tab === item.key
                     ? AppBackgroundStyles.footerBackground(isDarkMode)
                     : AppBackgroundStyles.mainBackground(isDarkMode),
-                color: tab === item.key ? "#ffffff" : "#000000",
+                color: tab === item.key 
+                  ? isDarkMode ?"#000" : "#fff"
+                  : isDarkMode ? "#fff" : "#000",
             }}
             onClick={() => setTab(item.key)}
             >
@@ -150,10 +153,9 @@ export default function NotificationPanel({
         </div>
       </div>
 
-      {/* Notifications */}
       <div className="p-4 space-y-3">
         {filteredNotifs.length === 0 ? (
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm" style={{ color: isDarkMode ? "#fff" : "#000" }}>
             Không có thông báo phù hợp.
           </p>
         ) : (
@@ -163,10 +165,12 @@ export default function NotificationPanel({
               onClick={() => markAsReadAndHandle(notif)}
               className={clsx(
                 "flex items-center justify-between gap-3 p-3 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800",
-                notif.isRead
-                  ? "bg-transparent"
-                  : "bg-green-50 dark:bg-green-900/30"
               )}
+              style={{
+                backgroundColor: notif.isRead
+                  ? isDarkMode ? "#1A2B1A" : "#F0F0F0"
+                  : isDarkMode ? "#C0C0C0" : "#C9C9C9",
+              }}
             >
               <div className="flex items-center gap-3">
                 <img
@@ -177,7 +181,7 @@ export default function NotificationPanel({
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <div className="text-sm font-medium dark:text-white">
+                  <div className="text-sm font-medium dark:text-white" style={{ color: isDarkMode ? "#FFFFFF" : "#000000" }}>
                     {notif.senderName}
                   </div>
                   <div className="text-xs text-gray-600 dark:text-gray-400">

@@ -3,7 +3,7 @@ import { collection, getDocs, getDoc, doc, query, where, orderBy } from "firebas
 import { db } from "../firebaseConfig";
 import { useCurrentUser } from "../hooks/useCurrentUser";
 import { postFromDocument } from "../models/PostModel";
-import type { PostModel } from "../models/PostModel";
+import { type PostModel } from "../models/PostModel";
 import { AppBackgroundStyles } from "../theme/theme";
 import { useTheme } from "../theme/ThemeProvider";
 
@@ -22,7 +22,11 @@ interface SharedPostItem {
   originalGroupName?: string | null;
 }
 
-export default function SharedPostTab() {
+interface SharedPostTabProps {
+  userId: string;  // userId cần phải được truyền vào để fetch dữ liệu chính xác
+}
+
+export default function SharedPostTab({ userId }: SharedPostTabProps) {
   const { user } = useCurrentUser();
   const { isDarkMode } = useTheme();
   const [sharedPosts, setSharedPosts] = useState<SharedPostItem[]>([]);
@@ -30,13 +34,13 @@ export default function SharedPostTab() {
 
   useEffect(() => {
     const fetchSharedPosts = async () => {
-      if (!user?.uid) return;
+      if (!userId) return; // Nếu không có userId thì không thực hiện gì
       setLoading(true);
       try {
         const sharedSnap = await getDocs(
           query(
             collection(db, "shared_posts"),
-            where("sharerUserId", "==", user.uid),
+            where("sharerUserId", "==", userId),  // Dùng userId để lấy bài chia sẻ của người khác
             orderBy("sharedAt", "desc")
           )
         );
@@ -46,6 +50,7 @@ export default function SharedPostTab() {
         for (const docSnap of sharedSnap.docs) {
           const data = docSnap.data();
 
+          // Lấy dữ liệu sharer và poster
           const sharerSnap = await getDoc(doc(db, "users", data.sharerUserId));
           const posterSnap = await getDoc(doc(db, "users", data.originUserId));
 
@@ -55,7 +60,7 @@ export default function SharedPostTab() {
           const poster = { uid: posterSnap.id, ...posterSnap.data() } as UserInfoModel;
 
           if (data.sharedInfo) {
-            // group share
+            // Nếu là bài chia sẻ nhóm
             results.push({
               post: {
                 postId: data.postId || docSnap.id,
@@ -72,7 +77,7 @@ export default function SharedPostTab() {
               originalGroupName: data.sharedInfo.originalGroupName,
             });
           } else {
-            // user share
+            // Nếu là bài chia sẻ người dùng
             const postSnap = await getDoc(doc(db, "posts", data.postId));
             if (!postSnap.exists()) continue;
             const post = postFromDocument(postSnap);
@@ -89,18 +94,18 @@ export default function SharedPostTab() {
 
         setSharedPosts(results);
       } catch (err) {
-        console.error("Lỗi khi tải danh sách bài chia sẻ:", err);
+        console.error("Error loading shared posts:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchSharedPosts();
-  }, [user?.uid]);
+  }, [userId]);  // Re-fetch dữ liệu khi `userId` thay đổi
 
   if (loading) return <div className="p-4 text-center">Loading...</div>;
 
-  if (!sharedPosts.length) return <div className="p-4 text-center">Chưa chia sẻ bài viết nào.</div>;
+  if (!sharedPosts.length) return <div className="p-4 text-center">No shared posts available.</div>;
 
   return (
     <div className="mt-6 w-full flex justify-center">
@@ -108,8 +113,8 @@ export default function SharedPostTab() {
         {sharedPosts.map(({ post, sharer, poster, sharedAt, sharedPostId, originalGroupName }) => (
           <div key={sharedPostId} className="p-4 rounded-lg border" style={{ backgroundColor: "#C8FAE4" }}>
             <div className="text-lg text-gray-600 mb-2">
-              <b>{sharer.displayName}</b> đã chia sẻ bài viết của <b>{poster.displayName}</b>
-              {originalGroupName && <> từ nhóm <b>{originalGroupName}</b></>}
+              <b>{sharer.displayName}</b> shared a post from <b>{poster.displayName}</b>
+              {originalGroupName && <> from the group <b>{originalGroupName}</b></>}
             </div>
             <div className="text-xs text-gray-400 mb-2">{sharedAt.toLocaleString()}</div>
             <div className="text-lg font-semibold">{post.postDescription}</div>

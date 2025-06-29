@@ -45,12 +45,12 @@ export default function PomodoroSettingsPage({ onClose }: { onClose: () => void 
       className="max-w-xl mx-auto px-6 py-8 rounded-lg shadow"
       style={{ backgroundColor: AppBackgroundStyles.mainBackground(isDarkMode) }}
     >
-      <h2 className="text-2xl font-bold mb-6 text-center">Cài đặt Pomodoro</h2>
+      <div className="text-2xl font-bold mb-6 text-center" style={{color: isDarkMode? "fff" : "000"}}>Cài đặt Pomodoro</div>
 
     {(["workMinutes", "shortBreakMinutes", "longBreakMinutes"] as const).map(
     (key: keyof PomodoroSettings) => (
-        <div key={key} className="mb-4">
-        <label className="block font-medium mb-1">
+        <div key={key} className="mb-4" style={{fontWeight:"normal",fontSize: 15, color: isDarkMode ? "#000000" : "#ffffff",}}>
+        <label className="block font-medium mb-1" style={{fontWeight:"bold",fontSize: 15, color: isDarkMode ? "#000000" : "#ffffff",}}>
             {key === "workMinutes"
             ? "Làm việc"
             : key === "shortBreakMinutes"
@@ -64,6 +64,7 @@ export default function PomodoroSettingsPage({ onClose }: { onClose: () => void 
             max={60}
             onChange={(e) => updateValue(key, parseInt(e.target.value))}
             className="w-full p-2 border rounded"
+            style={{color: isDarkMode ? "#000000" : "#ffffff"}}
         />
         </div>
     )
@@ -73,19 +74,28 @@ export default function PomodoroSettingsPage({ onClose }: { onClose: () => void 
       <div className="flex justify-between mt-8">
         <button
           onClick={handleSave}
-          className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+          className="px-6 py-2 rounded hover:bg-blue-600"
+          style={{
+            backgroundColor: isDarkMode ? "#C0C0C0" : "#F0F0F0",
+            color: isDarkMode ? "#ffffff" : "#000000",}}
         >
           Lưu
         </button>
         <button
           onClick={handleReset}
-          className="bg-gray-300 px-6 py-2 rounded hover:bg-gray-400"
+          className="px-6 py-2 rounded hover:bg-gray-400"
+          style={{
+            backgroundColor: isDarkMode ? "#C0C0C0" : "#F0F0F0",
+            color: isDarkMode ? "#ffffff" : "#000000",}}
         >
           Đặt lại
         </button>
         <button
           onClick={onClose}
-          className="bg-red-400 text-white px-6 py-2 rounded hover:bg-red-500"
+          className="px-6 py-2 rounded hover:bg-red-500"
+          style={{
+            backgroundColor: isDarkMode ? "#C0C0C0" : "#F0F0F0",
+            color: isDarkMode ? "#ffffff" : "#000000",}}
         >
           Hủy
         </button>

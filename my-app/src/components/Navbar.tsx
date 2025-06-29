@@ -20,6 +20,7 @@ import SearchPanel from "../pages/SearchPanel";
 import NotificationPanel from "../pages/NotificationPanel"; 
 import ProfilePage from "../pages/ProfilePage";
 import GroupPage from "../pages/GroupPage";
+import { is } from "date-fns/locale";
 
 
 export default function Navbar() {
@@ -33,9 +34,7 @@ export default function Navbar() {
 
   const [activeKey, setActiveKey] = useState<string>("");
 
-  const iconColor = isDarkMode
-    ? AppColors.darkTextPrimary
-    : AppColors.textPrimary;
+  const iconColor = isDarkMode ? "#FFFFFF" : "#000000";
 
     useEffect(() => {
     const pathToKeyMap: Record<string, string> = {
@@ -113,6 +112,7 @@ const menuItems = [
       setShowNotificationPanel(true);
       setCollapsed(true);
       setActiveKey("notifications");
+      setShowSearchPanel(false);
     },
   },
   { key: "groups", label: "Nhóm", icon: <UsersRound color={iconColor} />, path: "/groups" },
@@ -149,8 +149,8 @@ const menuItems = [
           collapsed ? "w-[80px]" : "w-[240px]"
         } border-r px-2 py-4 flex flex-col items-center md:items-start z-50`}
         style={{
-          backgroundColor: isDarkMode ? AppColors.darkBackground : "#C8FAE4",
-          borderColor: isDarkMode ? AppColors.darkBackgroundSecond : "#e5e5e5",
+          backgroundColor: isDarkMode ? "#163B25" : "#C8FAE4",
+          borderColor: isDarkMode ? "FFFFFF" : "#000000",
         }}
       >
         <div className="w-full mb-4 flex items-center justify-between px-2">
@@ -164,7 +164,7 @@ const menuItems = [
         </div>
 
         {/* Menu */}
-        <nav className="flex flex-col gap-2 w-full items-center md:items-start">
+        <nav className="flex flex-col gap-2 w-full items-center md:items-start" style={{ color: isDarkMode ? "#FFFFFF" : "#000000" }}>
           {menuItems.map((item) => (
             <MenuItem
               key={item.label}
@@ -185,7 +185,6 @@ const menuItems = [
           ))}
         </nav>
 
-        {/* Avatar + Display Name + Sign out */}
         <div className="mt-auto w-full pt-4">
           <div
             className="flex items-center gap-3 px-2 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-pointer transition"

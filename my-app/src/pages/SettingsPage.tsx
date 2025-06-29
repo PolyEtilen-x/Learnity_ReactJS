@@ -17,7 +17,7 @@ export default function SettingsPage() {
     {
       title: "Ghi chú",
       icon: <StickyNote className="w-6 h-6" />,
-      onClick: () => alert("Đi tới Ghi chú"),
+      onClick: () => navigate("/notes"),
     },
     {
       title: "Trợ giúp",
@@ -42,11 +42,14 @@ export default function SettingsPage() {
           <button
             key={index}
             onClick={item.onClick}
-            className="flex items-center justify-between w-full p-4 rounded-lg shadow border bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+            style={{backgroundColor: isDarkMode ? "#E8F8F6" : "#163B25",}}
+            className="flex items-center justify-between w-full p-4 rounded-lg "
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4" 
+            style={{ color: isDarkMode ? "#000000" : "#ffffff" }}>
               {item.icon}
-              <span className="text-lg font-medium">
+              <span className="text-lg font-medium"
+                style={{ color: isDarkMode ? "#000000" : "#fff" }}>
                 {item.title}
               </span>
             </div>

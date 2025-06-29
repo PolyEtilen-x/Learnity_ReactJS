@@ -5,6 +5,7 @@ import { collection, addDoc, updateDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { uploadImageToCloudinary } from "../utils/uploadtoCloudinary";
 import { FiImage } from "react-icons/fi";
+import { is } from "date-fns/locale";
 
 export default function CreatePostPage() {
   const { user } = useCurrentUser();
@@ -68,12 +69,14 @@ export default function CreatePostPage() {
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div className="p-6 max-w-2xl mx-auto"
+      style={{color: is ? "#FFFFFF" : "#000000"}}>
       <h2 className="text-2xl font-bold mb-4">Tạo bài đăng mới</h2>
       <input
         type="text"
         placeholder="Tiêu đề bài đăng"
         className="w-full p-2 mb-3 border rounded"
+        style={{ color: is ? "#FFFFFF" : "#000000" }}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
@@ -81,6 +84,7 @@ export default function CreatePostPage() {
         placeholder="Nội dung"
         className="w-full p-2 mb-3 border rounded"
         value={content}
+        style={{ color: is ? "#FFFFFF" : "#000000" }}
         onChange={(e) => setContent(e.target.value)}
         rows={4}
       ></textarea>

@@ -9,6 +9,7 @@ import { AppBackgroundStyles } from "../theme/theme";
 import type { PostModel } from "../models/PostModel";
 import { postFromDocument } from "../models/PostModel";
 import SharedPostTab from "../components/SharedPostList";
+import { Bold } from "lucide-react";
 
 
 interface UserInfoModel {
@@ -70,10 +71,14 @@ export default function ProfilePage() {
 
         <div className="flex-1">
           <div className="flex items-center gap-4">
-            <h2 className="text-2xl font-semibold">{profileData.username}</h2>
+            <div style={{color: isDarkMode ? "fff" : "000", fontSize: 32}} >{profileData.username}</div>
             <button
               className="px-4 py-1 rounded-md bg-gray-200 text-sm font-medium hover:bg-gray-300"
               onClick={() => navigate("/edit-profile")}
+              style={{
+                backgroundColor: isDarkMode ? "#444444" : "#E8F8F6",
+                color: isDarkMode ? "#FFFFFF" : "#000000",
+              }}
             >
               Chỉnh sửa
             </button>
@@ -123,7 +128,7 @@ export default function ProfilePage() {
           <PostCard post={post} isDarkMode={isDarkMode} />
         </div>
       ))}
-    {tab === "shared" && <SharedPostTab />}
+    {tab === "shared" && <SharedPostTab userId={user?.uid ?? ""}/>}
   </div>
 </div>
 

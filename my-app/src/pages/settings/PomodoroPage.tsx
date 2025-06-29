@@ -97,7 +97,11 @@ export default function PomodoroPage() {
       <div className="flex gap-4 mt-6">
         <button
           onClick={() => setIsRunning((prev) => !prev)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-black rounded shadow"
+          className="flex items-center gap-2 px-4 py-2rounded shadow"
+          style={{
+            backgroundColor: isRunning ? "#f0ad4e" : "#5cb85c",
+            color: "fff",
+          }}
         >
           {isRunning ? <Pause size={20} /> : <Play size={20} />}
           {isRunning ? "Tạm dừng" : "Bắt đầu"}
@@ -105,14 +109,20 @@ export default function PomodoroPage() {
 
         <button
           onClick={reset}
-          className="p-2 bg-gray-300 dark:bg-gray-700 rounded-full"
+          className="p-2 rounded-full"
+          style={{
+            backgroundColor: isDarkMode ? "#C0C0C0" : "#F0F0F0",
+            color: isDarkMode ? "#ffffff" : "#000000",}}
         >
           <RotateCcw size={20} />
         </button>
 
         <button
           onClick={() => setShowSettings(true)}
-          className="p-2 bg-gray-300 dark:bg-gray-700 rounded-full"
+          className="p-2 rounded-full"
+          style={{
+            backgroundColor: isDarkMode ? "#C0C0C0" : "#F0F0F0",
+            color: isDarkMode ? "#ffffff" : "#000000",}}
         >
           <Settings size={20} />
         </button>

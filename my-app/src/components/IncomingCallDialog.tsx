@@ -31,10 +31,14 @@ const IncomingCallDialog: React.FC<Props> = ({ callID, callerName, userID, userN
         <h3 className="text-lg font-semibold mb-2">{callerName} đang gọi tới</h3>
         <p className="mb-4">Bạn có muốn trả lời cuộc gọi không?</p>
         <div className="flex justify-center gap-4">
-          <button className="bg-red-300 text-white px-4 py-2 rounded" onClick={rejectCall}>
+          <button className="text-white px-4 py-2 rounded"
+          style={{ backgroundColor: "#FF0000" }}
+          onClick={rejectCall}>
             Từ chối
           </button>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded" onClick={acceptCall}>
+          <button className="text-white px-4 py-2 rounded" 
+          style={{ backgroundColor: "#00FF00" }}
+          onClick={acceptCall}>
             Trả lời
           </button>
         </div>
