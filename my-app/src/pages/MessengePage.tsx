@@ -66,7 +66,7 @@ export default function ChatPage() {
     const callID = generateCallID(currentUser.uid, selectedUser.id);
 
     await setDoc(doc(db, "video_calls", callID), {
-      callID,
+      callID: callID,
       callerId: currentUser.uid,
       receiverId: selectedUser.id,
       callerName: currentUser.displayName || "Người gọi",

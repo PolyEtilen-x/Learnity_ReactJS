@@ -26,6 +26,8 @@ import { formatDistanceToNow } from "date-fns";
 import { vi } from "date-fns/locale/vi";
 import PostDetailPanel from "../pages/PostDetailPanel";
 import ShareOptionsDialog from "./ShareOptionsDialog";
+import ImageViewerModal from "./ImageViewerModal";
+
 
 interface PostCardProps {
   post: PostModel;
@@ -40,12 +42,20 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
   const [commentCount, setCommentCount] = useState(post.comments ?? 0);
   const [shareCount, setShareCount] = useState(post.shares || 0);
   const [showDetail, setShowDetail] = useState(false);
-  const [showImageModal, setShowImageModal] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState<number | null>(null);
 
   const postRef = doc(db, "posts", post.postId!);
   const likeDocRef = doc(db, "post_likes", `${post.postId}_${user?.uid}`);
   const commentsCollection = collection(db, "comments", post.postId!, "list");
+
+  const openImageViewer = (index: number) => {
+  setActiveImageIndex(index);
+  };
+
+  const closeImageViewer = () => {
+    setActiveImageIndex(null);
+  };
 
   const getCommentCount = async (postId: string): Promise<number> => {
   try {
@@ -147,6 +157,100 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
       <span>{count}</span>
     </button>
   );
+  const imageArray: string[] = Array.isArray(post.imageUrls)
+  ? post.imageUrls
+  : typeof post.imageUrls === "string" && post.imageUrls !== ""
+    ? [post.imageUrls]
+    : [];
+  
+  const renderImages = () => {
+  if (imageArray.length === 1) {
+    return (
+      <div className="mt-3">
+        <div className="w-full aspect-video overflow-hidden rounded-md">
+          <img
+            src={imageArray[0]}
+            alt="post-img-0"
+            className="w-full h-full object-cover"
+            onClick={() => openImageViewer(0)}
+            onError={(e) => (e.currentTarget.src = "/broken-image.png")}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (imageArray.length === 2) {
+    return (
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        {imageArray.map((url, index) => (
+          <div key={index} className="aspect-square overflow-hidden rounded-md">
+            <img
+              src={url}
+              alt={`post-img-${index}`}
+              className="w-full h-full object-cover"
+              onClick={() => openImageViewer(index)}
+              onError={(e) => (e.currentTarget.src = "/broken-image.png")}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+if (imageArray.length === 3) {
+  return (
+    <div className="mt-3 flex gap-2 h-[300px]">
+      <div className="w-1/2 h-full overflow-hidden rounded-md">
+        <img
+          src={imageArray[0]}
+          alt="img-0"
+          className="w-full h-full object-cover rounded-md"
+          onError={(e) => (e.currentTarget.src = "/broken-image.png")}
+        />
+      </div>
+
+      <div className="w-1/2 flex flex-col gap-2 h-full">
+        {[1, 2].map((index) => (
+          <div key={index} className="flex-1 overflow-hidden rounded-md">
+            <img
+              src={imageArray[index]}
+              alt={`img-${index}`}
+              className="w-full h-full object-cover rounded-md"
+              onClick={() => openImageViewer(index)}
+              onError={(e) => (e.currentTarget.src = "/broken-image.png")}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+  return (
+    <div className="mt-3 grid grid-cols-2 gap-2">
+      {imageArray.slice(0, 4).map((url, index) => (
+        <div key={index} className="aspect-square overflow-hidden rounded-md relative">
+          <img
+            src={url}
+            alt={`post-img-${index}`}
+            className="w-full h-full object-cover"
+            onClick={() => openImageViewer(index)}
+            onError={(e) => (e.currentTarget.src = "/broken-image.png")}
+          />
+          {index === 3 && imageArray.length > 4 && (
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center rounded-md">
+              <span className="text-white text-lg font-bold">
+                +{imageArray.length - 4}
+              </span>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 
   return (
     <div className="bg-white rounded-xl shadow-sm border p-4 mb-4" style={{ backgroundColor: isDarkMode ? "#163B25" : "#C8FAE4" }}>
@@ -172,18 +276,28 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
               }
             }} />
           </div>
-          {post.postDescription && <p className="font-bold mt-2 text-base" style={{color: isDarkMode ? "#FFFFFF" : "#000000" }}>{post.postDescription}</p>}
-          {post.content && <p className="mt-1 text-sm whitespace-pre-line" style={{color: isDarkMode ? "#FFFFFF" : "#000000" }}>{post.content}</p>}
-          {post.imageUrl && (
-            <div className="mt-3">
-              <img
-                src={post.imageUrl}
-                alt="post"
-                className="rounded-md w-full max-h-[300px] object-cover"
-                onError={(e) => (e.currentTarget.src = "/broken-image.png")}
-              />
+
+          {Array.isArray(post.tagList) && post.tagList.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {post.tagList.map((tag, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1 rounded-full text-sm font-medium"
+                  style={{
+                    backgroundColor: isDarkMode ? "#0e4d3a" : "#d1fae5",
+                    color: isDarkMode ? "#ffffff" : "#065f46"
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           )}
+
+          {post.content && <p className="mt-1 text-sm whitespace-pre-line" style={{color: isDarkMode ? "#FFFFFF" : "#000000" }}>{post.content}</p>}
+          
+          {renderImages()}
+
           <div className="flex justify-around items-center mt-4 border-t pt-2 text-sm"  style={{color: isDarkMode ? "#FFFFFF" : "#000000" }}>
             <ActionButton icon={isLiked ? <FiHeart fill="red" /> : <FiHeart />} count={likeCount} onClick={handleLikePost} active={isLiked} />
             <ActionButton icon={<FiMessageCircle />} count={commentCount} onClick={() => setShowDetail(true)} />
@@ -197,7 +311,8 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
         onClose={() => setShowShareOptions(false)}
         onInternalShare={handleInternalShare}
         onExternalShare={async () => {
-          const text = `${post.content ?? ""}\n\n${post.postDescription ?? ""}\n(Chia sẻ từ Learnity)`;
+          const tags = Array.isArray(post.tagList) ? post.tagList.join(", ") : "";
+          const text = `${post.content ?? ""}\n\n${tags ? `Chủ đề: ${tags}\n\n` : ""}(Chia sẻ từ Learnity)`;
           try {
             await navigator.share({ text });
           } catch (err) {
@@ -211,6 +326,16 @@ export default function PostCard({ post, isDarkMode, onPostUpdated }: PostCardPr
           <PostDetailPanel post={post} onClose={() => setShowDetail(false)} />
         </div>
       )}
+
+      {activeImageIndex !== null && (
+        <ImageViewerModal
+          images={imageArray}
+          index={activeImageIndex}
+          onClose={closeImageViewer}
+          onChangeIndex={(index) => setActiveImageIndex(index)}
+        />
+      )}
+
     </div>
   );
 }

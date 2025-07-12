@@ -5,16 +5,17 @@ export interface PostModel {
   username?: string;
   avatarUrl?: string;
   isVerified: boolean;
-  postDescription?: string;
+  tagList?: string[];
   content?: string;
-  imageUrl?: string;
-  likes?: number;
-  comments?: number;
-  shares?: number;
+  imageUrls?: string[]; 
+  likes: number;
+  comments: number;
+  shares: number;
   uid?: string;
-  createdAt: Date;
+  createdAt?: Date;
   isLiked: boolean;
   sharedByUid?: string;
+  isHidden?: boolean;
 }
 
 export const createEmptyPost = (): PostModel => ({
@@ -22,15 +23,16 @@ export const createEmptyPost = (): PostModel => ({
   username: "",
   avatarUrl: "",
   isVerified: false,
-  postDescription: "",
+  tagList: [],
   content: "",
-  imageUrl: "",
+  imageUrls: [],
   likes: 0,
   comments: 0,
   shares: 0,
   uid: "",
   createdAt: new Date(),
   isLiked: false,
+  isHidden: false,
 });
 
 export const postFromFirestore = (data: any, docId?: string): PostModel => ({
@@ -38,21 +40,29 @@ export const postFromFirestore = (data: any, docId?: string): PostModel => ({
   username: data.username ?? "",
   avatarUrl: data.avatarUrl ?? "",
   isVerified: data.isVerified ?? false,
-  postDescription: data.postDescription ?? "",
+  tagList: Array.isArray(data.tagList) ? data.tagList : [],
   content: data.content ?? "",
-  imageUrl: data.imageUrl ?? "",
+  imageUrls: Array.isArray(data.imageUrls)
+    ? data.imageUrls
+    : typeof data.imageUrls === "string"
+      ? [data.imageUrls]
+      : [],
   likes: data.likes ?? 0,
   comments: data.comments ?? 0,
   shares: data.shares ?? 0,
   uid: data.uid ?? "",
   sharedByUid: data.sharedByUid ?? "",
-  createdAt: (data.createdAt instanceof Timestamp)
-    ? data.createdAt.toDate()
-    : new Date(),
+  createdAt:
+    data.createdAt instanceof Timestamp
+      ? data.createdAt.toDate()
+      : data.createdAt ?? new Date(),
   isLiked: data.isLiked ?? false,
+  isHidden: data.isHidden ?? false,
 });
 
-export const postFromDocument = (doc: DocumentSnapshot<DocumentData>): PostModel => {
+export const postFromDocument = (
+  doc: DocumentSnapshot<DocumentData>
+): PostModel => {
   const data = doc.data()!;
   return postFromFirestore(data, doc.id);
 };
@@ -62,9 +72,9 @@ export const postToFirestore = (post: PostModel): Record<string, any> => ({
   username: post.username,
   avatarUrl: post.avatarUrl,
   isVerified: post.isVerified,
-  postDescription: post.postDescription,
+  tagList: post.tagList ?? [],
   content: post.content,
-  imageUrl: post.imageUrl,
+  imageUrls: post.imageUrls ?? [],
   likes: post.likes,
   comments: post.comments,
   shares: post.shares,
@@ -72,4 +82,13 @@ export const postToFirestore = (post: PostModel): Record<string, any> => ({
   sharedByUid: post.sharedByUid,
   createdAt: post.createdAt,
   isLiked: post.isLiked,
+  isHidden: post.isHidden,
+});
+
+export const copyPost = (
+  post: PostModel,
+  updates: Partial<PostModel>
+): PostModel => ({
+  ...post,
+  ...updates,
 });
